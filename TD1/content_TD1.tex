@@ -1,0 +1,511 @@
+
+\newcommand{\numTD}{TD1}
+\newcommand{\themeTD}{manipulations de base en \textsc{Python}}
+
+\input{../entete_TD_methodoM1}
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+
+\section{Installation et rappels}
+
+ Pour les consignes d'installation, référez vous au module de Remise à Niveau : % \url{http:www.lejeunegael.fr/cours.html} puis dans quelques jours sur Moodle :
+\begin{itemize}
+\item \url{https://moodle.paris-sorbonne.fr}, Sciences Humaines/Informatique Appliquée
+\item ou \url{https://moodle.paris-sorbonne.fr/course/index.php?categoryid=5925}
+\end{itemize}
+
+ Vous devez commencer à être familier des notions suivantes:
+\begin{itemize}
+\item Instruction, variable
+\item Type, typage, affectation
+\item Opération, opérateur, opérande
+
+\end{itemize}
+Si ce n'est pas le cas, c'est le moment de vous manifester !
+
+\section{Les chaînes de caractères}
+
+\subsection{Affichage et manipulations de base}
+
+ Saisissez les chaînes de caractères suivantes dans votre notebook :
+
+\begin{python}
+phrase1 = "les oeufs durs."
+phrase2 = "Oui, dit-il,"
+phrase3 = "j'aime bien"
+\end{python}
+
+Testez différents affichages :
+\begin{python}
+print(phrase2, phrase3, phrase1)
+
+print(phrase2)
+print(phrase3)
+print(phrase1)
+
+print(phrase2+ phrase3+phrase1)
+\end{python}
+ L'opération réalisée par cette dernière instruction s'appelle \textbf{concaténation} de chaînes de caractères, elle est réalisée par l'opérateur "+". 
+On voit donc que l'opérateur "+" ne se comporte pas de la même manière selon les opérandes qu'il affecte: 
+\begin{python}
+phrase1 = 3
+phrase2 = 4
+phrase3 = 1 
+
+print(phrase2+ phrase3+phrase1)
+\end{python}
+
+
+\subsection{Formatage de chaînes}
+
+Testez l'affichage suivant où l'on sépare les chaînes et les traitements qui leur sont appliqués.
+\begin{python}
+
+print("%s--%s--%s"%(phrase2, phrase3, phrase1))
+
+print("{}--{}--{}".format(phrase2, phrase3, phrase1))
+
+# la méthode format permet des manipulations plus riches :
+produit = "chocolat"
+prix = 0.456
+print("Le %s vaut %.2f euros" % (produit, prix))
+\end{python}
+
+
+Modifiez les déclarations des variables et ajoutez o\`u vous souhaitez les caractères suivants : $\backslash n$ et $\backslash t$. Par exemple :
+
+\begin{python}
+
+print(phrase2+"\t"+ phrase3+"\n"+phrase1)
+
+print("%s\t%s\n%s"%(phrase2, phrase3, phrase1))
+
+print("Le %s vaut \n\t %.2f euros sans sucre\n\t
+ idem avec" % (produit, prix))
+\end{python}
+
+Dans l'exemple ci-dessous, notez la présence de l'antislash (\textbackslash) avant l'apostrophe. Testez cet exemple en omettant l'antislash :
+
+\begin{python}
+toto = 'N\'est-ce pas ?'
+print(toto)
+\end{python}
+
+Testez maintenant cet exemple, en mettant tout d'abord l'antislash, puis sans le
+mettre :
+\begin{python}
+toto = "N\"est-ce pas ?"
+print(toto)
+\end{python}
+
+" et ' sont équivalents, et sont des caractères spéciaux délimitant des  chaînes
+ de  caractères, ici ils aident \textsc{Python} à faire la délimitation (\textit{parsing}) des éléments composant les instructions. On peut \textbf{protéger les caractères spéciaux} au sein d'une chaîne de caractère en utilisant l'antislash, on dit aussi qu'on les déspécialise.
+ Si \textsc{Python} ne parvient pas à délimiter, on a de bonnes chances d'avoir une \textit{syntax error}.
+
+
+\subsection{Une chaîne de caractères en tant que collection ordonnée d'éléments}
+
+ Saisissez cet exemple. Que concluez-vous sur la fa\c con dont Python gère les
+chaînes de caractères ?
+
+\begin{python}
+ch = "Stephanie mange."
+print(ch[0], ch[3])
+\end{python}
+
+%Quelques fonctions de manipulation de chaîne
+
+ Il est possible d'obtenir la longueur d'une chaîne avec la fonction len(). Affichez la longueur de la chaîne \texttt{ch} :
+\begin{python}
+print(len(ch))
+\end{python}
+
+ Affectez maintenant ces valeurs aux variables ch et n. De quel type sont ces deux
+variables ? Que constatez-vous ?
+\begin{python}
+ch = "8000"
+n = 45
+print(ch+n)
+\end{python}
+
+ Il est alors nécessaire de convertir la chaîne de caractère en entier. On utilise pour cela la fonction int(). Dans l'exemple ci-dessous, on affecte une nouvelle valeur à la variable ch. Testez ce code :
+
+\begin{python}
+ch = int(ch)
+print(ch+n)
+\end{python}
+
+ Tentons maintenant de convertir la chaîne "bonjour" en un entier. Entrez le code ci-dessous. Que se passe-t-il ?
+
+\begin{python}
+ch = int("bonjour")
+print(ch)
+\end{python}
+
+Une variable peut être convertie, par exemple, en integer avec la fonction int(), en chaîne de caractères avec str() (str signifiant string), en flottant avec float().
+
+ Certaines opérations sur des variables de types différents sont cependant
+acceptées par Python. Par exemple, saisissez ce code :
+
+\begin{python}
+s = "bonjour"
+n = 5
+print(s*n)
+\end{python}
+
+\section{Les listes : des éléments ordonnés}
+
+ L'exemple ci-dessous présente une liste nommée "jour". Saisissez l'exemple à la
+console.
+
+\begin{python}
+jour = ["lundi", "mardi", "mercredi", 1800,
+20.357, "jeudi", "vendredi"]
+print(jour)
+\end{python}
+
+Une liste peut contenir différents types de variables.
+ Maintenant, affichons l'élément à l'indice 2 de la liste (voir exemple). Que
+constatons-nous ?
+
+\begin{python}
+print(jour[2])
+\end{python}
+
+
+Une liste en Python commence par l'indice 0.
+
+On peut parcourir un mliste de la manière suivante :
+\begin{python}
+for toto in jour:
+  print(toto)
+\end{python}
+
+On peut faire des vérifications sur les types en même temps :
+\begin{python}
+for toto in jour:
+  print(toto)
+  print(type(toto))
+\end{python}
+
+\subsubsection*{Manipuler une liste}
+
+ On peut également assigner une nouvelle valeur à un élément de la liste. Entrez
+l'exemple ci-dessous, et affichez le contenu de la liste pour vérifier que votre
+modification a bien été prise en compte.
+
+\begin{python}
+jour[3] = "Juillet"
+\end{python}
+
+ Les fonctions len(liste) et del(liste[indice]) permettent respectivement d'obtenir la longueur de la liste (i.e. le nombre d'éléments la constituant), et de supprimer un élément à une position définie de la liste.
+
+\begin{python}
+
+len(jour)
+del(jour[4])
+print(jour)
+\end{python}
+
+ Que se passe-t-il si l'on tape l'exemple ci-dessous ?
+
+\begin{python}
+del(jour[9])
+\end{python}
+
+
+
+ La méthode append permet d'ajouter un élément à la liste. Ajoutez un élément comme dans l'exemple ci-dessous, puis affichez la liste. O\`u le nouvel élément a-t-il été placé ?
+
+\begin{python}
+jour.append('samedi')
+\end{python}
+
+
+Manipuler et visualiser des données
+\section{Interaction avec l'utilisateur}
+
+La commande input() met en attente le script. La suite ne sera exécutée que lorsque l'utilisateur aura saisi une entrée.
+a) Saisissez ce code dans votre console. On note la présence de l'opérateur puissance **.
+
+\begin{python}
+print('Veuillez entrer un nombre positif quelconque :')
+nn = input()
+print('Le carre de', nn, 'vaut', nn**2)
+\end{python}
+
+Que se passe-t-il ? Comment corriger cette erreur ?
+
+L'exemple ci-dessous est une fa\c con plus réduite d'écrire le même code :
+\begin{python}
+nn = input('Veuillez entrer un nombre positif quelconque : ')
+print('Le carré de', nn, 'vaut', nn**2)
+\end{python}
+
+%% Dans l'exemple ci-dessous, on demande à l'utilisateur d'entrer son prénom entre guillemets. Que se passe-t-il si l'on ne met pas ces guillemets ?
+%%
+%%\begin{python}
+%%prenom = input('Entrez votre prénom (entre
+%%guillemets) : ')
+%%print('Bonjour, ', prenom)
+%%\end{python}
+
+\section{Factorisation : bibliothèques, scripts et fonctions}
+
+\subsection*{Les bibliothèques}
+
+Une bibliothèque (appelée également "librairie" par anglicisme) regroupe une quantité de fonctions et de
+variables utiles. Faire appel à une bibliothèque permet de ne pas avoir à réécrire à chaque fois le contenu d'une fonction souvent utilisée.
+
+ Recopiez l'exemple ci-dessous. La première ligne peut se lire "depuis la bibliothèque math, importe tout".
+
+\begin{python}
+from math import *
+nombre = 121
+print("racine carrée de",nombre,"=",sqrt(nombre))
+angle = pi/6
+print("sinus de", angle,"radians","=",sin(angle))
+\end{python}
+
+Quels sont les deux fonctions de la bibliothèque math utilisées ? A quelle variable fait-on également appel ?
+
+Plut\^ot que de charger toute la bibliothèque, on peut également charger uniquement les variables et fonctions dont on se sert (on lit : "depuis la bibliothèque math, importe pi, sqrt et sin") :
+
+
+\begin{python}
+from math import pi, sqrt, sin
+\end{python}
+
+
+\subsection*{Création d'un script}
+
+On appelle script un code que l'on va sauvegarder pour le réutiliser ultérieurement.
+
+Recopiez ligne après ligne, testez puis sauvegarder le code suivant dans un fichier texte (nommé \texttt{TD1.1\_NUMETU.py} où NUMETU est votre numéro d'étudiant à 8 chiffres). Déposez le sur Moodle à l'endroit dédié.
+% {TD1.1.py}
+\begin{python}
+phr = input("Veuillez entrer une phrase : ")
+print(phr)
+cch = input("Entrez la lettre qu'il faut compter : ")
+print(cch)
+nc = i = 0
+while i < len(phr):
+  if phr[i] == cch:
+    nc = nc + 1
+  i = i + 1
+print("La phrase contient", nc, " la lettre ", cch)
+\end{python}
+
+
+\subsection*{Les fonctions en Python}
+
+
+ \'Etudiez la fonction ci-dessous. Ne la recopiez pas maintenant.
+\begin{python}
+def table():
+  toto = 1
+  while toto <= 10 :
+    print(toto * 7),
+    toto = toto + 1
+\end{python}
+
+Repérez le \textbf{nom} de la fonction dans ce script.
+
+Que fait-elle ? Repérez le type de \textbf{boucle} utilisée au sein de cette fonction.
+
+ Sur papier, notez dans un tableau les valeurs successives de \textbf{toto} durant l'exécution de la boucle, en faisant tourner le script à la main (i.e. sans utiliser la machine). Voici ce que vous devez noter :
+
+\begin{itemize}
+\item Valeur initiale de toto
+\item Valeur maximale de toto
+\item Valeurs successives de toto
+\end{itemize}
+
+ Copiez le code dans un nouveau script python (que vous nommerez TD1.2.table.py).
+Si vous exécutez le script il ne se passe rien car une fonction a besoin d'être "appelée", elle ne s'exécute pas toute seule.
+ Ajoutez donc un appel à cette fonction (voir ci-dessous) :
+\begin{python}
+table()
+\end{python}
+
+ En reprenant le script ci-dessus, comment faire pour appeler trois fois de suite la fonction table7 ? Proposez deux fa\c cons.
+
+ \'Ecrivez un script (dans un fichier nommé TD1.3.epeler.py) permettant d'afficher un à un les caractères de la chaîne "Demain, il va pleuvoir.". Ce script devra apparaître au sein d'une fonction nommée " epeler\_mot ".
+
+
+\subsubsection*{Fonctions avec paramètres}
+
+La fonction \texttt{table} ne prenait pas de données en entrée, nous allons voir ici comment une fonction peut manipuler des données qui ne soit plus déterminées à l'avance mais spécifiées par celui qui appelle la fonction.
+
+ Recopiez l'exemple ci-dessous, et enregistrez-le dans un nouveau fichier T1.4.table.py.
+\begin{python}
+def table(base):
+  n = 1
+  while n <11 :
+    print(n * base)
+    n = n +1
+\end{python}
+
+Que fait cette fonction ? Quelle est l'utilité du paramètre base ?
+
+Appelez cette fonction en lui passant en paramètre la valeur 10.
+
+ Ajoutez le code ci-dessous à la suite de votre script, puis exécutez-le.
+\begin{python}
+a = 1
+while a<=20:
+  print("\nPasse numero",a)
+  table(a)
+  a = a + 1
+\end{python}
+
+A quoi sert cette boucle while ? Que fait le script ?
+Adaptez ce code afin qu'il n'affiche que les tables de multiplication de 5 à 10.
+
+ \'Editez maintenant le script epeler.py afin que la fonction epeler\_mot prenne en paramètre une chaîne de caractères.
+
+Dans votre script, réalisez deux appels à la fonction epeler\_mot, en prenant une fois en paramètre la chaîne s1, puis s2 (voir ci-dessous).
+\begin{python}
+s1 = "Demain, il va pleuvoir."
+s2 = "Aujourd'hui, il fait beau."
+\end{python}
+
+
+ Dans un nouveau script (tableMulti.py), copiez le code suivant :
+\begin{python}
+def tableMulti(base, debut, fin):
+  print("Fragment de la table de multiplication par", base)
+  n = debut
+  while n <= fin :
+    print(n, 'x', base, '=', n * base)
+    n = n +1
+\end{python}
+
+Appelez cette fonction de fa\c con à afficher la table de multiplication de 5, de 1 à 10.
+
+ Ajoutez le code ci-dessous et exécutez-le. Afin de vous entraîner à la
+compréhension d'un code, écrivez le tableau des valeurs successives de t, d et f.
+
+\begin{python}
+t, d, f = 11, 5, 10
+while t<21:
+  tableMulti(t,d,f)
+  t, d, f = t+1, d+3, f+5
+\end{python}
+
+ Créez un nouveau script (appelé stop\_lettre.py). Dans ce script, testez une chaîne de caractères en l'analysant caractère par caractère. Chaque caractère sera
+affiché, sauf s'il correspond à un caractère interdit. Par exemple, si nous analysons la chaîne "Rien ne va plus maintenant." et que la lettre interdite est "a", le script affichera ceci :
+
+\vspace{0.1cm}
+R i e n
+
+n e
+
+v
+
+p l u s
+
+m i n t e n n t.
+\vspace{0.1cm}
+
+Pour ce faire, Vous utiliserez impérativement une fonction qui prendra deux paramètres : la chaîne de caractères à analyser, et le caractère interdit.
+
+
+ Adaptez le script stop\_lettre.py afin qu'il s'interrompe lorsqu'il rencontrera le caractère interdit (plut\^ot que de continuer à afficher). Vous aurez peut-être besoin de la commande break (qui interrompt une boucle).
+
+\vspace{0.1cm}
+R i e n
+
+n e
+
+v
+
+\vspace{0.1cm}
+
+ Recopiez ce code dans un nouveau script :
+\begin{python}
+def politesse(nom, vedette ='Monsieur'):
+  print("Veuillez agréer,", vedette, nom, ", mes salutations distinguées.")
+\end{python}
+
+Appelez cette fonction avec pour seul paramètre "Dupont", et ensuite avec les paramètres ("Dupont", "Mademoiselle").
+Testez une syntaxe alternative pour la deuxième ligne, le " formatage de chaîne " :
+
+\begin{python}
+print("Veuillez agréer,%s,%s, mes salutations distinguées."%(vedette,nom))
+\end{python}
+
+Sur le même principe, écrivez une fonction qui affiche le résultat de la
+multiplication entre deux paramètres. Si le deuxième paramètre n'est pas fourni
+lors de l'appel à la fonction, alors par défaut il vaut 10.
+
+\subsubsection*{Portée des variables}
+ Dans un nouveau script, copiez et exécutez le code ci-dessous :
+
+\begin{python}
+def f(s):
+  print(s)
+f("bonsoir")
+\end{python}
+
+Notez que l'on peut passer en paramètre directement la valeur d'une variable lors d'un appel à une fonction ( f("bonsoir") ).
+Que se passe-t-il si l'on ajoute à la suite de ce code print(s) ? Notez qu'il se passe la même chose si l'on cherche à connaître la valeur de s à la console.
+
+
+ Exécutez le script tableMulti.py, et tentez à la console d'afficher la valeur de la variable base.
+
+\begin{python}
+print(base)
+\end{python}
+
+Pourquoi recevez-vous une erreur ?
+
+Repérez pour chaque variable utilisée dans ce code si elle est locale à une fonction, ou globale.
+
+
+\begin{python}
+def mask():
+  p = 20
+  print("Au sein de la fonction :",p, q)
+  p, q = 15, 38
+print("En dehors de la fonction :",p,q)
+mask()
+\end{python}
+
+A chaque endroit o\`u sont citées les variables p et q au sein du code, indiquez si elles sont globales ou locales.
+
+\subsubsection*{Fonctions avec retour}
+
+\begin{python}
+def f(n):
+  n = n*2
+  return n
+
+resultat = f(3)
+print(resultat)
+\end{python}
+
+Une fa\c con de rédiger le code de manière plus condensée serait :
+\begin{python}
+def f(n):
+  return n*2
+print(f(3))
+\end{python}
+
+ Copiez ce code et exécutez le. Affichez ensuite le résultat de table(9).
+
+\begin{python}
+def table(base):
+  result = []
+  n = 1
+  while n < 11:
+    b = n * base
+  result.append(b)
+  n = n +1
+  return result
+\end{python}
+

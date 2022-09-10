@@ -1,0 +1,469 @@
+
+\newcommand{\numTD}{TD6}
+\newcommand{\themeTD}{Aller plus loin avec \textsc{SciKitlearn}}
+
+\input{../entete_TD_methodoM1}
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+
+\noindent\fcolorbox{red}{lightgray}{
+\begin{minipage}{12cm}
+\section*{Objectifs}
+
+\begin{itemize}
+  \item Utiliser classification report
+  \item Comprendre les paramètres des classifieurs
+  \item Tester de nouvelles caractéristiques
+  \item Combiner des jeux de caractéristiques
+\end{itemize}
+\end{minipage}
+}
+\vspace{.5cm}
+
+Le code ci-dessous est donné dans le notebook Python sur Moodle.
+
+\section{Retour sur ce que l'on a fait précédemment}
+
+Notez bien que vous ne trouverez pas systématiquement les mêmes résultats que moi du fait du découpage train/test, l'ordre de grandeur ne doit pas bouger par contre.
+
+ \subsection*{Récupérer les instances (X) et les classes (y) et vectoriser}
+
+\begin{python}
+import pandas as pd
+data_spam =pd.read_csv("spamham.csv")
+y = data_spam["spam"]
+from sklearn.feature_extraction.text import CountVectorizer
+V = CountVectorizer(ngram_range = (1,2) )
+X = V.fit_transform(data_spam["text"])
+\end{python}
+
+
+\subsection*{Séparer train test}
+\begin{python}
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+\end{python}
+
+\subsection*{Récupérer les instances (X) et les classes (y) et vectoriser}
+\begin{python}
+y = data_spam["spam"]
+from sklearn.feature_extraction.text import CountVectorizer
+V = CountVectorizer(ngram_range = (1,2) )
+X = V.fit_transform(data_spam["text"])
+\end{python}
+
+\subsection*{Séparer train et test}
+
+\begin{python}
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+\end{python}
+
+\subsection*{Classifier et évaluer}
+
+
+\begin{python}
+from sklearn.linear_model import Perceptron
+ppn = Perceptron(eta0=0.1, random_state=0)
+ppn.fit(X_train, y_train)
+y_pred = ppn.predict(X_test)
+\end{python}
+
+Avec un exemple simple d'évaluation, l'exactitude, où on fait la somme de tous les cas où la valeur dans y\_test est bien trouvée dans y\_pred :
+
+\begin{python}
+print('Bons résultats %d' % (y_test == y_pred).sum())
+print('Erreurs: %d' % (y_test != y_pred).sum())
+\end{python}
+
+Ce qui nous donnait:
+\begin{itemize}
+  \item Bons résultats 1687
+  \item Erreurs: 32
+\end{itemize}
+
+\section{Pour aller plus loin dans l'évaluation}
+
+Le module classification\_report de \textsc{SciKitLearn}, code ci-dessous, nous eprmet d'obtenir le résultat figurant dans le tableau \ref{class_report1}.
+
+\begin{python}
+from sklearn.metrics import classification_report
+report = classification_report(y_test, y_pred)
+print(report)
+\end{python}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lllll}
+\hline
+ &   precision& recall & f1-score &  support\\
+\hline
+
+    0&    0.99&   0.98&   0.99&   1314\\
+    1&    0.95&   0.98&   0.96&    405\\
+\hline
+
+   micro avg&    0.98&   0.98&   0.98&   1719\\
+   macro avg&    0.97&   0.98&   0.97&   1719\\
+weighted avg&    0.98&   0.98&   0.98&   1719\\
+\hline
+\end{tabular}
+\caption{Rapport de classification "de base"\label{class_report1}}
+\end{center}
+\end{table}
+
+Comme nous savons que le 1 c'est spam et le 0 c'est ham, on peut écrire ceci :
+
+\begin{python}
+nom_classes = ["ham", "spam"]
+report = classification_report(y_test, y_pred, target_names=nom_classes)
+print(report)
+\end{python}
+
+Ce qui donne le même tableau mais avec cette fois les noms des classes ou \textit{labels} (cf. Tableau \ref{class_report2}). 
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{lllll}
+
+\hline
+ &   precision& recall&  f1-score&   support\\
+\hline
+
+  ham&    0.99&   0.98&   0.99&   1314\\
+ spam&    0.95&   0.98&   0.96&    405\\
+\hline
+
+   micro avg&    0.98&   0.98&   0.98&   1719\\
+   macro avg&    0.97&   0.98&   0.97&   1719\\
+weighted avg&    0.98&   0.98&   0.98&   1719\\
+
+\end{tabular}
+\caption{Rapport de classification avec les noms des classes\label{class_report2}}
+\end{center}
+\end{table}
+
+Un peu de terminologie :
+
+\begin{itemize}
+  \item Précision, rappel, f-mesure: c'est du déjà vu
+  \item Le support c'est le nombre d'instances concernées
+  \item La micro f-mesure c'est la moyenne \textbf{pondérée} des F-mesure (une classe compte en fonction de sa taille), ça présente mieux la classe majoritaire
+  \item La macro f-mesure c'est la moyenne des F-mesure de chaque classe (idnépendamment de leur taille), ça représente mieux la classe minoritaire généralement plus difficile à trouver
+\end{itemize}
+
+ \subsection*{ On peut enregistrer le classification report pour s'en servir plus tard}
+
+\begin{python}
+w = open("report_classifier=perceptron_dataset=spam.txt", "w")
+w.write(report)
+w.close()
+\end{python}
+
+ \subsection*{On peut avoir les résultats sous forme de structure de données Python}
+
+\begin{python}
+stats = precision_recall_fscore_support(y_test, y_pred)
+print(stats)
+from sklearn.metrics import precision_recall_fscore_support
+stats = precision_recall_fscore_support(y_test, y_pred)
+print(stats)
+\end{python}
+
+\subsection*{Dans l'ordre les précisions pour chaque classe, puis les rappels, les F-mesure et les supports}
+
+\begin{python}
+( array([0.99307692, 0.9451074 ]), 
+  array([0.98249619, 0.97777778]), 
+  array([0.98775822, 0.96116505]), 
+  array([1314,  405]))
+\end{python}
+
+\subsection*{Et maintenant la matrice de confusion}
+
+\begin{python}
+print(matrice_confusion)
+from sklearn.metrics import confusion_matrix
+matrice_confusion = confusion_matrix(y_test, y_pred)
+print(matrice_confusion)
+\end{python}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{ll}
+1291   &23 \\
+   9   &396\\
+\end{tabular}
+\end{center}
+\caption{Matrice de Confusion}
+\end{table}
+
+\section{Explorer les paramètres du classifieur arbre de décision} % pour jouer avec les paramètres
+
+\begin{python}
+from sklearn import tree
+DT = tree.DecisionTreeClassifier()
+DT = DT.fit(X_train, y_train)
+y_pred = DT.predict(X_test)
+
+matrice_confusion = confusion_matrix(y_test, y_pred)
+print(matrice_confusion)
+\end{python}
+
+Résultat :
+
+\begin{python}
+[[1257   57]
+ [  32  373]]
+\end{python}
+
+
+Regardons l'impact du paramètres \texttt{random\_state}
+
+\begin{python}
+print("Avec la valeur par défaut de random state")
+for i in range(3):
+  DT = tree.DecisionTreeClassifier()
+  DT = DT.fit(X_train, y_train)
+  y_pred = DT.predict(X_test)
+  matrice_confusion = confusion_matrix(y_test, y_pred)
+  print(matrice_confusion)
+  stats = precision_recall_fscore_support(y_test, y_pred)
+  print(stats)
+
+\end{python}
+
+On voit que les résultats varient entre les itérations :
+
+\begin{python}
+[[1249   65]
+ [  29  376]]
+(array([0.97730829, 0.85260771]), 
+ array([0.95053272, 0.92839506]), 
+ array([0.96373457, 0.88888889]), 
+ array([1314,  405]))
+--------------------
+[[1253   61]
+ [  35  370]]
+(array([0.97282609, 0.85846868]), 
+ array([0.95357686, 0.91358025]), 
+ array([0.9631053 , 0.88516746]), 
+ array([1314,  405]))
+--------------------
+[[1255   59]
+ [  35  370]]
+(array([0.97286822, 0.86247086]), 
+ array([0.95509893, 0.91358025]), 
+ array([0.96390169, 0.88729017]), 
+ array([1314,  405]))
+--------------------
+\end{python}
+
+
+ En fixant random state ça ne bouge plus : 
+
+\begin{python}
+for i in range(3):
+  DT = tree.DecisionTreeClassifier(random_state=0)
+  DT = DT.fit(X_train, y_train)
+  y_pred = DT.predict(X_test)
+  matrice_confusion = confusion_matrix(y_test, y_pred)
+  print(matrice_confusion)
+  stats = precision_recall_fscore_support(y_test, y_pred)
+  print(stats)
+  print("--"*10)
+\end{python}
+
+Allez voir l'explication donnée sur ce paramètre \texttt{random\_state} ici :
+
+\small{\url{https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html}}
+
+Intéressez vous ensuite aux paramètres suivants: \texttt{max\_depth}, \texttt{min\_samples\_split}, \texttt{min\_samples\_leaf} et \texttt{max\_features}.
+Lancez différentes expériences pour voir leur impact respectif.
+
+\section{Avec d'autres caractéristiques}
+
+Ce que l'on a fait jusqu'ici c'est du sac de mots, ou Bag of Words (BOW), même si on ajouté des choses:
+
+\begin{itemize}
+  \item n-grams
+  \item caractères plutôt que mots (sac de caractères si on peut dire)
+  \item pondération tf-idf
+\end{itemize}
+
+On va tester d'autres caractéristiques maintenant, ce que l'on va appeler des caractéristiques "stylistiques". On va pour chaque texte compter quelques caractéristiques, les ranger dans un vecteur et donner ça au classifieur.
+
+\begin{python}
+import statistics
+
+X_stylo = []#notre nouvelle matrice de description
+for text in data_spam["text"]:
+    liste_mots = text.split()
+    phrases = text.split(". ")
+    NB_phrases = len(phrases)
+    NB_mots = len(liste_mots)
+    NB_caracteres = len(text)
+    moyenne_taille_mots = statistics.mean([len(x) for x in liste_mots])
+    moyenne_taille_phrases = NB_mots/NB_phrases
+    caracteristiques = [NB_phrases, NB_mots, NB_caracteres, moyenne_taille_mots, moyenne_taille_phrases]
+    X_stylo.append(caracteristiques)
+\end{python}
+
+Chaque texte est décrit par 5 caractéristiques, et on va voir si le classifieur arrive à quelque chose.
+
+ Notez bien dans les parenthèses que l'on utilise X\_stylo désormais
+
+\begin{python}
+X_train, X_test, y_train, y_test = train_test_split(X_stylo, y, test_size=0.3, random_state=0)
+DT = tree.DecisionTreeClassifier()
+DT = DT.fit(X_train, y_train)
+y_pred = DT.predict(X_test)
+matrice_confusion = confusion_matrix(y_test, y_pred)
+print(matrice_confusion)
+stats = precision_recall_fscore_support(y_test, y_pred)
+print(stats)
+\end{python}
+
+Ce qui donne :
+
+\begin{python}
+[[1097  217]
+ [ 196  209]]
+(array([0.84841454, 0.49061033]), 
+ array([0.8348554 , 0.51604938]), 
+ array([0.84158036, 0.50300842]), 
+ array([1314,  405]))
+\end{python}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lllll}
+\hline
+ &   precision& recall & f1-score &  support\\
+\hline
+	 ham&   0.85&  0.83&  0.84&  1314\\
+	spam&   0.49&  0.52&  0.50&   405\\
+\hline
+   micro avg&   0.76&  0.76&  0.76&  1719\\
+   macro avg&   0.67&  0.68&  0.67&  1719\\
+weighted avg&   0.76&  0.76&  0.76&  1719\\
+\hline
+\end{tabular}
+\caption{Classifieur stylométrique}
+\end{center}
+\end{table}
+
+
+Verdict, ce n'est pas exceptionnel mais ça donne des résultats meilleur que si on mettait tout en spam ou tout en ham (ce que l'on appelle un classifieur \textsc{ZeroRule}:
+
+\begin{python}
+y_spam = [1 for x in y_test]##une liste remplie de 1
+report = classification_report(y_spam, y_pred, target_names=nom_classes)
+matrice_confusion = confusion_matrix(y_spam, y_pred)
+print(matrice_confusion)
+print(report)
+
+y_ham = [0 for x in y_test]##une liste remplie de 0
+report = classification_report(y_ham, y_pred, target_names=nom_classes)
+matrice_confusion = confusion_matrix(y_ham, y_pred)
+print(matrice_confusion)
+print(report)
+\end{python}
+
+\begin{python}
+[[   0 1314]#0 ham, Tout est spam
+ [   0  405]]
+\end{python}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lllll}
+\hline
+ &   precision& recall & f1-score &  support\\
+\hline
+	 ham&   0.00&  0.00&  0.00&  1314\\
+	spam&   0.24&  1.00&  0.38&   405\\
+\hline
+   micro avg&   0.24&  0.24&  0.24&  1719\\
+   macro avg&   0.12&  0.50&  0.19&  1719\\
+weighted avg&   0.06&  0.24&  0.09&  1719\\
+\hline
+\end{tabular}
+\caption{Classifieur \textsc{ZeroRule}: tout est \textit{spam}}
+\end{center}
+\end{table}
+
+Puis en mettant tout en ham :
+
+\begin{python}
+[[1314    0]
+ [ 405    0]]
+\end{python}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lllll}
+\hline
+ &   precision& recall & f1-score &  support\\
+\hline
+ ham&   0.76&  1.00&  0.87&  1314\\
+spam&   0.00&  0.00&  0.00&   405\\
+\hline
+   micro avg&   0.76&  0.76&  0.76&  1719\\
+   macro avg&   0.38&  0.50&  0.43&  1719\\
+weighted avg&   0.58&  0.76&  0.66&  1719\\
+
+
+\hline
+\end{tabular}
+\caption{Classifieur \textsc{ZeroRule}: tout est \textit{ham}}
+\end{center}
+\end{table}
+
+Observez bien la colonne rappel, remarquez que la colonne f-score montre que notre classifieur stylo marche correctement.
+
+\subsection*{On peut combiner les deux ?}
+
+Oui, on va concaténer des matrices :
+
+\begin{python}
+## on regarde la "forme" de X
+print(X.shape[0])#NB lignes   -> instances
+print(X.shape[1])#Nb colonnes -> caractéristiques
+
+##on crée une sparse matrix avec notre X_stylo
+from scipy.sparse import csr_matrix
+sparse_stylo = csr_matrix(X_stylo)
+print(sparse_stylo.shape[0])#NB lignes   -> instances
+print(sparse_stylo.shape[1])#Nb colonnes -> caractéristiques
+\end{python}
+On a le même nombre de ligne, on peut donc faire une concaténation horizontale :
+\begin{python}
+from scipy.sparse import hstack
+X_fusion = hstack((X, sparse_stylo))
+\end{python}
+
+\begin{python}
+X_train, X_test, y_train, y_test = train_test_split(X_fusion, y, test_size=0.3, random_state=0)
+DT = tree.DecisionTreeClassifier()
+DT = DT.fit(X_train, y_train)
+y_pred = DT.predict(X_test)
+matrice_confusion = confusion_matrix(y_test, y_pred)
+print(matrice_confusion)
+stats = precision_recall_fscore_support(y_test, y_pred)
+print(stats)
+report = classification_report(y_test, y_pred, target_names=nom_classes)
+print(report)
+\end{python}
+Malheureusement, ça marche moins bien qui le BOW tout seul (ce qui ne signifie pas que ce serait le cas sur tout jeu de données).
+
+\section{Pour aller plus loin}
+
+Dans un nouveau notebook, explorez les possibilités offertes par les forêtes d'arbres aléatoires : \small{\url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html}}
+
+

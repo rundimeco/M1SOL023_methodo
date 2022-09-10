@@ -1,0 +1,208 @@
+
+\newcommand{\numTD}{TD4}
+\newcommand{\themeTD}{ScikitLearn}
+
+\input{../entete_TD_methodoM1}
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+\noindent\fcolorbox{red}{lightgray}{
+\begin{minipage}{12cm}
+\section*{Objectifs}
+
+\begin{itemize}
+  \item Manipuler la bibliothèque Scikitlearn
+  \item Maîtriser la terminologie : classes, instances, attributs \dots
+  \item Effectuer une comparaison sur un même jeu de données
+\end{itemize}
+\end{minipage}
+}
+
+\vspace{.5cm}
+\textbf{\textcolor{blue}{Pour ce TD, vous travaillerez obligatoirement en binômes}}
+
+\vspace{-.5cm}
+
+\section{Terminologie}
+
+ Allez observer le jeu de données \texttt{iris} en JSON : \url{https://www.kaggle.com/rtatman/iris-dataset-json-version}.
+ Explorez le jeu de données pour répondre aux questions suivantes :
+
+\begin{enumerate}
+  \item Combien d'instances comporte le corpus Iris au total ?
+  \vspace{-.35cm}
+  \item Combien de classes d'iris sont décrites dans ce corpus ?
+  \vspace{-.35cm}
+  \item Quels sont les noms des classes d'iris ?
+  \vspace{-.35cm}
+  \item Combien d'instances pour chaque classe ?
+  \vspace{-.35cm}
+  \item Combien d'attributs (\textit{features}) permettent de décrire ces classes ?
+  \vspace{-.35cm}
+  \item Quels sont les noms des attributs ?
+  \vspace{-.35cm}
+\end{enumerate}
+
+\section{Manipulations de base dans \textsc{ScikitLearn}}
+
+% Au TD précédent nous avons vu l'outil \textsc{Weka}. Un des intérêts de cet outil est d'être entièrement manipulable à la souris. Mais c'est aussi un des inconvénients.
+% En effet, avec les outils dont le \textbf{Coût d'entrée} est faible, il est facile de faire des choses simples mais faire des choses élaborées est difficile.
+
+ \textsc{Scikit} impose de tout faire en \textsc{Python} mais ceci permet de ne pas avoir à manipuler sans cesse des formats de données différents par opposition à des outils de type click-o-drome. % Nous verrons à la fin du TD que le format \textsc{Arff} peut être parfois pénible et que manipuler tout dans le même langage a des avantages.
+%\textbf{Néanmoins l'objectif est de vous laisser libre de travailler pour votre projet de fin de semestre avec l'outil que vous préférez}. Vous pourrez naviguer entre les deux, changer d'avis \dots De toutes façons, l'outil importe moins que les résultats que vous obtenez et l'analyse que vous en faites.
+
+
+\subsection{Iris dataset}
+
+ Nous suivrons l'excellent tutoriel de \textsc{Kaggle} sur le sujet\footnote{\url{https://www.kaggle.com/chungyehwang/scikit-learn-classifiers-on-iris-dataset}} dont une version légère figure sur Moodle.
+
+ C'est cette version légère que vous allez travailler en premier.
+
+\subsection{Fruits dataset}
+
+ Un autre tutoriel sur un autre jeu de données, nous allons suivre une version adaptée et mise à jour d'un tutoriel en ligne\footnote{\url{https://towardsdatascience.com/solving-a-simple-classification-problem-with-python-fruits-lovers-edition-d20ab6b071d2}}. Là aussi, le notebook complet figure sur Moodle.
+
+ Un des premiers problèmes quand on veut utiliser l'apprentissage automatique c'est de disposer de données, si possible étiquetées (c'est le $y$) et de préparer ces données pour avoir une représentation utilisable : les instances, représentées par leurs attributs et regroupées ensemble dans une structure de données souvent nommées $X$ (l'ensemble des exemples $x_0 x_1$ \dots.
+ L'algorithme de classification cherchent à apprendre comment trouver les étiquettes ($y$) à partir des exemples ($x$).
+
+Ici les données étaient toutes prêtes, dans le prochain TD nous verrons comment préparer des données textuelles pour de l'apprentissage.
+
+\subsection{Retour sur Iris dataset}
+
+Testez maintenant la version complète du notebook de Kaggle, vous verrez que le corps reste le même, ce qui a été ajouté est : (I) du pré-traitement des données (le \textsc{Scaler}) et (II) de la visualisation.
+
+\end{document}
+
+%%% ci-dessous: la partie NLTK qui doit disparaître
+
+\section{Accéder aux corpus de NLTK}
+
+Maintenant nous allons vouloir utiliser des données textuelles. Pour avoir une idée des possibilités de structuration d'un corpus, nous allons manipuler les corpus fournis dans la bibliothèque NLTK.
+
+\begin{itemize}
+  \item Recopiez et testez le code ci-dessous.
+\begin{python}
+import nltk
+nltk.download('gutenberg')#import d'un corpus
+from nltk.corpus import gutenberg 
+gutenberg.fileids()
+\end{python}
+
+  \item Que fait la méthode \texttt{fileids} ? Si aucun résultat de ne s'affiche, modifiez le code pour afficher le résultat de l'appel à la méthode \texttt{fileids}.
+
+\item Ajoutez la ligne suivante à votre code. Faites afficher le résultat. Que remarquez-vous ?
+
+\begin{python}
+emma = gutenberg.words('austen-emma.txt')
+\end{python}
+  \item Adaptez votre code pour pouvoir lire le contenu du fichier melville-moby\_dick.txt (corpus Gutenberg), puis ch08 (corpus Brown).
+  \item  Affichez le contenu du texte ch08. Ouvrez ensuite le fichier ch08 avec un éditeur de texte et comparez (cherchez dans votre système le dossier \texttt{nltk\_data}). Au besoin, utilisez le code ci-dessous :
+\end{itemize}
+
+\begin{python}
+print(dir(nltk.data))#liste toutes les méthodes de l'objet nltk.data
+print(nltk.data.path)# affiche les chemins de nltk_data
+\end{python}
+
+\section{Corpus Gutenberg}
+
+\begin{itemize}
+  \item  Récupérez le code ci-dessous sur Moodle.
+\begin{python}
+for fileid in gutenberg.fileids():
+    print("\n",fileid,":")
+    num_chars = len(gutenberg.raw(fileid))
+    print(num_chars,"caracteres")
+    num_words = len(gutenberg.words(fileid))
+    print(num_words,"mots")
+    num_sents = len(gutenberg.sents(fileid))
+    print(num_sents,"phrases")
+    mots_minuscule = [w.lower() for w in gutenberg.words(fileid)]
+    num_vocab = len(set(mots_minuscule))
+    print(num_vocab,"mots differents")
+\end{python}
+  \item Que fait la fonction len() ?
+
+  \item Identifiez les 3 méthodes utilisées dans cet exemple, et expliquez ce qu'elles permettent d'obtenir. Si besoin, faites afficher leur résultat.
+  \item Qu'est-ce que la structure de données \texttt{set} permet de faire dans cet exemple ?
+  \item  Éditez votre code afin d'afficher également le nombre moyen de caractères par mot, le nombre moyen de mots par phrase, et la richesse lexicale (rapport entre le nombre de mots différents et le nombre total de mots).
+\end{itemize}
+
+
+\section{Catégories dans le corpus Brown}
+\begin{itemize}
+  \item  Recopiez ce code et testez-le.
+\begin{python}
+from nltk.corpus import brown 
+brown.categories()
+brown.words(categories='news')
+brown.words(fileids=['cg22'])
+brown.sents(categories=['news', 'editorial','reviews']) 
+\end{python}
+  \item  Adaptez le code afin d'afficher les différentes catégories.
+  \item  Affichez le nombre de mots de tous les textes contenus dans la catégorie "news".
+  \item  Adaptez le code afin d'afficher les identifiants de tous les textes contenus dans les catégories "news", "editorial" et "reviews".
+
+\end{itemize}
+
+%%Projet : Constitution du corpus
+%%  \item  Vous devez tout d'abord définir les 3 genres littéraires sur lesquels portera votre étude : « news », « literature » et « sciences ».
+%%L'exemple de code ci-dessous (à compléter) permet de définir une répartition des catégories de document en trois grands types, et d'afficher le nombre de documents disponibles et la taille en nombre de mots.
+%%
+%%print(brown.categories())
+%%
+%%themes={}
+%%themes["news"] = ['categorie', 'categorie', etc.]
+%%themes["literature"] = ['categorie', 'categorie', etc.]
+%%themes["sciences"] = ['categorie', 'categorie', etc.]
+%%
+%%for category in themes:
+%%    print(category, ":")
+%%    print(len(brown.fileids(categories=themes[category])), "documents")
+%%    print(len(brown.words(categories=themes[category])), "mots")
+%%
+%%
+%%  \item  Pour chaque catégorie, regardez de quels types de document il s’agit (récupérez les fileids et allez regarder ce que contiennent les fichiers, ou faites-le afficher en Python)
+%%
+%%  \item  Regroupez les catégories que vous estimez faire partie des thématiques « news », « literature » et « sciences ».
+%%
+%%  \item  En vous inspirant du code ci-dessus, assurez-vous que les tailles de vos trois sous-corpus sont équilibrées.
+%%Projet : Construction d'un train set et d'un test set
+%%Il s'agit de sélectionner aléatoirement 80% de votre corpus total afin de constituer un train set. Nous allons extraire 80% des instances, de façon homogène entre chaque classe, afin de constituer le train set. Toutes les instances restantes constitueront le test set.
+%%
+%%  \item  L'exemple ci-dessous vous permet de constituer votre corpus en un tableau à plusieurs dimensions, où les noms des documents sont classés par catégories.
+%%
+%%corpus = {}
+%%
+%%for category in themes:
+%%    corpus[category] = brown.fileids(categories=themes[category])
+%%
+%%  \item  Calculez la taille totale de votre corpus (i.e. le nombre total d'instances), et calculez le nombre d'instances représentant 80% de cette taille.
+%%
+%%  \item  A partir de ce chiffre, calculez le nombre d'instance à extraire pour chaque classe (le nombre d'instances train divisé par le nombre de classes).
+%%
+%%  \item  L'algorithme ci-dessous est une façon d'extraire aléatoirement les instances du corpus initial afin de les ajouter dans le corpus train.
+%%
+%%
+%%Pour chaque catégorie:
+%%	x est le nombre d'instance à extraire par catégorie
+%%	Faire x fois:
+%%Choisir un indice au hasard parmi le nombre d'instances pour cette catégorie
+%%Trouver l'instance correspondant à cet indice
+%%		Ajouter l'instance au tableau corpus train
+%%Supprimer l'instance du tableau corpus initial
+%%
+%%Codez cet exemple. Vous obtiendrez un train set et un test set, contenant chacun tous les noms de documents classés par catégories.
+%%
+%%Vous aurez probablement besoin de la méthode randint (librairie random) dont voici un exemple d'utilisation :
+%%
+%%#Un chiffre au hasard entre 1 et 10
+%%import random
+%%x = random.randint(1,10)
+%%Les étapes suivantes :
+%%Constituer le feature set à partir du train set (fréquence de mots, etc.)
+%%Construire le .arff
+%%

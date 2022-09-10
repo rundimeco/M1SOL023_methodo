@@ -1,0 +1,10 @@
+chaine = "Analogie de traitement entre listes ..."
+print(chaine[3])
+print(chaine[2])
+print(chaine[1:6])
+print(chaine[10:])
+print(chaine[-3:])
+print(chaine[:-6])
+print(chaine.count("e"))
+print(chaine[::-1].replace(".", "_", 1)[::-1])
+print(chaine.find("entre"))

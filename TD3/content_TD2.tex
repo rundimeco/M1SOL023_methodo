@@ -1,0 +1,548 @@
+
+\newcommand{\numTD}{TD2}
+\newcommand{\themeTD}{Lecture/écriture de fichiers}
+
+\input{../entete_TD_methodoM1}
+
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+
+\section*{Installation et rappels}
+
+ Pour les consignes d'installation, référez vous au module de Remise à Niveau disponible sur Moodle :
+\begin{itemize}
+\item \url{https://moodle.paris-sorbonne.fr/} puis "Sciences Humaines" et "Informatique Appliquée"
+\item ou directement : \url{https://moodle.paris-sorbonne.fr/course/index.php?categoryid=411}
+\end{itemize}
+
+ \textbf{Dans ce TD nous allons beaucoup exploiter la notion de "script"}.
+
+ Si vous êtes sur un notebook (\textsc{Jupyter} ou autre, cela va correspondre à la notion de cellule. Il faut juste penser à ajouter en commentaire (avec \#) la mention "Exercice X". Sauf instruction contraire, démarrer chaque cellule avec "\# \texttt{Exercice y} où y est le numéro de l'exercice. Si un exercice réclame plusieurs cellules, la première démarrera par "\#Exercice 2" puis "Exercice 2b" \dots
+
+Si vous utilisez Idle ou un éditeur de texte classique il s'agit tout simplement de fichiers, il s'agit tout simplement d'un fichier portant l'extension ".py" dans lequel nous allons enregistrer notre code. 
+Sauf instruction contraire, appelez ces fichiers \texttt{TDx\_EXy.py} où x est le numéro du TD et y celui de l'exercice; Su in exercice réclame plusieurs scripts, appelez le premier "TD2\_EX3.py" puis "TD2\_EX3b.py" \dots
+
+\newpage
+\section{Manipulation de fichiers}
+ Un des grands intérêts d'utiliser un langage de programmation est de pouvoir effectuer automatiquement des opérations pénibles et répétitives sur les fichiers. Dans cette section nous verrons comment manipuler des fichiers (ouvrir, enregistrer \dots) sans passer systématiquement par des phases de clic dans une interface graphique.
+
+ A première vue cela semblera sans doute un peu "exotique" pour les plus débutants d'entre vous. Songez que lorsque l'on fait du TAL, on peut être amené à ouvrir successivement des milliers de fichiers. Vous verrez assez vite le gain qu'il y a à automatiser ces étapes.
+
+\subsection{Écrire dans un fichier}
+
+ Dézippez l'archive \texttt{Methodo\_TD2.zip} disponible sur Moodle. Elle va vous créer un dossier Methodo\_TD2, dans lequel vous enregistrerez les scripts du TD. Y figurent également un dossier contenant des textes dont nous nous servirons par la suite.
+
+\exer
+
+ Nous utiliserons l'instruction \texttt{open} qui prend deux paramètres : le chemin et le mode d'accès au fichier ("r" par défaut). Recopiez le code ci-dessous: %  CHEMIN par le chemin qui mène à votre propre dossier (par exemple "C:/Methodo\_TD2/Textes").
+\begin{python}
+f = open("tests.txt", "a")
+f.write("Ceci est un premier ajout.")
+f.write("Voici un deuxieme ajout.")
+f.close()
+\end{python}
+
+%Essayez la version ci-dessous en remplaçant bien CHEMIN par le chemin qui mène
+%à votre propre dossier.
+ La librairie \texttt{os} permet l'accès aux fonctionnalités du système d'exploitation (quel qu'il soit), pour créer automatiquement des dossiers par exemple.
+
+\begin{python}
+import os 
+os.makedirs("tests/")#crée le dossier (si vous avez les droits !)
+os.chdir ("tests/")
+f = open("tests.txt", "a")
+f.write("Ceci est un premier ajout (second essai).")
+f.write("Voici un deuxième ajout (second essai).")
+f.close()
+\end{python}
+
+\begin{itemize}
+%\item Quelle est l'utilité de la méthode \texttt{chdir} ?
+\item A quoi sert la variable f ?
+\item Que signifie le paramètre "a" dans la fonction open ? (voir doc Python)
+\end{itemize}
+
+Ouvrez les deux fichiers "tests.txt" nouvellement créés (un figure dans le répertoire courant, l'autre dans le dossier \texttt{tests}.
+ On remarque que la méthode \texttt{write} ajoute nos phrases à la suite les unes des autres. Que pouvons nous modifier dans le code pour que les phrases soient sur deux lignes différentes ?
+
+\subsection{Lire dans un fichier}
+
+\exer
+
+ Dans un nouveau script python, écrivez un code permettant d'afficher le contenu du fichier "Informatique.txt" (situé dans votre dossier Methodo\_TD2/Textes). Voici quelques indications :
+
+\begin{itemize}
+\item N'oubliez pas de désigner le répertoire de travail courant.
+\item Le mode d'accès au fichier est "r" (lecture seule).
+\item La méthode à utiliser pour la lecture est \texttt{read()} (sans paramètre cette fois).
+\end{itemize}
+
+ La méthode \texttt{read()} retourne tout le contenu du fichier (sous forme de chaîne). \textbf{N'oubliez pas de fermer le flux (= le fichier ouvert) avec la méthode \texttt{close()} !}
+
+ Testez un autre appel à la méthode \texttt{read()}, recopiez ce code :
+\begin{python}
+print(f.read(10))
+print(f.read(20))
+print(f.read(30))
+\end{python}
+
+\begin{itemize}
+\item Comprenez vous ce que signifient les paramètres 10, 20 et 30 ?
+\item Observez la différence de comportement si vous n'appelez que f.read(10), ou que f.read(20), ou que f.read(30) dans votre script.
+\end{itemize}
+ Éditez votre code afin de n'afficher que Informatik (qui apparaît dans la
+première phrase).
+
+\newpage
+\exer
+
+ Dans un nouveau script, recopiez ce code :
+\begin{python}
+def CopieFichier(source, destination):
+  fs = open(source,"r")
+  fd = open(destination, "w")
+  while 1:
+    txt = fs.read(50)
+    if txt == "":break
+    fd.write(txt)
+  fs.close()
+  fd.close()
+  return "'%s' copié dans '%s'"%(source, destination)
+CopieFichier("Textes/Informatique.txt", "Textes/Informatique2.txt")
+
+\end{python}
+
+%TODO: ajouter os.system ? à vérifier sur Windows
+
+\begin{itemize}
+\item Expliquez ce que signifie "while 1:"
+\item Comment fait on pour sortir de cette boucle ?
+\item Que signifie le mode w ?
+%\item Ce code fonctionne t-il si le fichier "source" est un document vide ? Testez en créant un fichier vide "toto.txt".
+\end{itemize}
+
+Testez la fonction suivante qui lit tout le flux d'un coup :
+\begin{python}
+def CopieFichier2(source, destination):
+  fs = open(source,"r")
+  fd = open(destination, "w")
+  txt = fs.read()
+  fd.write(fd)
+  fs.close()
+  fd.close()
+  return "'%s' copié dans '%s'"%(source, destination)
+\end{python}
+\exer
+ Écrivez un code permettant de lire dans le fichier "Lignes.txt". Vous afficherez la première ligne de texte grâce à la méthode \texttt{readline()}:
+
+\begin{python}
+print(f.readline())
+\end{python}
+
+Éditez votre précédent code afin de stocker l'intégralité des lignes dans une
+variable. La méthode à utiliser ici s'appelle  \texttt{readlines()} :
+
+\begin{python}
+t = f.readlines()
+\end{python}
+
+\begin{itemize}
+ \item Faites afficher la variable t, ainsi que son type.
+\end{itemize}
+
+\exer
+
+ Observez le code suivant :
+
+\begin{python}
+def filtre(source, destination):
+  fs = open(source, "r")
+  fd = open(destination, "w")
+  while 1:
+    txt = fs.readline()
+    if txt=="":
+      break
+    if txt[0]!="#":
+      fd.write(txt)
+  fs.close()
+  fd.close()
+  return
+filtre("Textes/avant_filtrage.txt","Textes/apres_filtrage.txt")
+\end{python}
+
+ Éditez ce code afin qu'il supprime également les lignes vides. Les lignes vides sont celles qui ne comportent que des sauts de ligne. Comme ils sont interprétés (on saute à la ligne), il faut les repérer grâce à leur représentation informatique :"$\backslash r$$\backslash n$" ou seulement "$\backslash n$"). % entre les paragraphes.
+
+\subsection{Gestion des erreurs avec Try et Except}
+ Ce qui vous est présenté dans cette section est une "astuce" de programation très utile, et pas seulement pour les problèmes que nous voyons dans ce TD.
+
+Quand votre code renvoie une erreur qui empêche l'exécution de la totalité du script, utilisez les instructions \texttt{try} et \texttt{except} pour gérer cette erreur.
+
+Pour comprendre le fonctionnement de ces deux instructions, observez la différence entre les deux codes suivants:
+
+\begin{python}
+print("toto")
+1/0
+print("titi")
+\end{python}
+
+A comparer avec :
+\begin{python}
+print("toto")
+try:
+  1/0
+except Exception as e:
+  print(" Erreur rencontrée : ", e)
+  print(" On continue quand même")
+
+print("titi")
+\end{python}
+
+Vous adapterez le code suivant afin que la ligne "Bonjour !" s'affiche toujours, qu'il y ait eu erreur d'ouverture ou non.
+
+\begin{python}
+import os
+os.chdir ("./Textes")
+f = open("fichierquelconque.txt", "r")
+print(f.readlines())
+print("Bonjour !")
+\end{python}
+
+\section{Structure de données : listes et ensembles}%les itérables}
+
+Les listes (\texttt{list}) et les ensembles (\texttt{set}), permettent de stocker un grand nombre de données, elles ont des propriétés particulières. La liste est une série d'éléments entre crochets séparés par des virgules, dans une liste les éléments sont rangés dans un certain ordre. Les ensembles sont des séries d'éléments uniques entre accolades et séparés par des virgules. L'instruction \texttt{set()} permet de créer un ensemble vide (pour le remplir plus tard. Contrairement à une liste, il n'y a pas de notion d'ordre et il n'y a pas non plus de doublons (tous les éléments sont uniques). On peut transformer un ensemble toto en liste en écrivant :
+\begin{python}
+toto = list(toto)
+\end{python}
+
+L'opération inverse se fait avec l'instruction \texttt{set()}, si je veux retransformer toto en ensemble, j'écris donc  :
+
+\begin{python}
+toto = set(toto)
+\end{python}
+
+ Allez jeter un coup d'œil sur les sections 5.1 (jusqu'au 5.1.1) et 5.4 de la documentation sur le sujet : 
+
+ \url{https://docs.python.org/3/tutorial/datastructures.html}\\
+
+\subsection{Avantages respectifs des deux structures}
+
+\exer
+
+ Copiez-collez la liste ci-dessous (\texttt{liste1}) Vous effectuerez différentes manipulations et à chaque fois, affichez la valeur de la variable \texttt{liste} et son type.
+
+\begin{python}
+liste1=[1,2,3,4,5,5,65,65,"B",34,43,4,54,"y",6,3,65,4,"a","P"]
+print(liste1)
+print(type(liste1))
+\end{python}
+
+A noter que mettre ou pas des espaces au niveau des virgules de la liste ne change rien.
+
+ Retirez les doublons en transformant cette liste en ensemble :
+
+\begin{python}
+liste1 = set(liste1)
+print(liste1, type(liste1))
+\end{python}
+
+ Redéfinissez la variable liste comme une variable de type \texttt{list} :
+
+\begin{python}
+liste1 = list(liste1)
+\end{python}
+
+%TODO: exemple avec vocabulaire
+
+Parcourez tous les éléments de la liste avec une boucle \texttt{for} :
+
+\begin{python}
+for toto in liste1:
+  print(toto)
+\end{python}
+
+Remarquez que l'on prend les éléments un par un et qu'on leur donne un nom pour pouvoir les manipuler comme des variables. Ici c'est \texttt{toto}. 
+ Si l'élément est une chaîne de caractère, et qu'il est en minuscules (lowercase), transformez-le en majuscules (uppercase). Voici les outils dont vous avez besoin :
+
+\begin{python}
+type(toto) is str #Renvoie Vrai si toto est de type String
+str.isupper()# Vérifie si str est en majuscules (booléen)
+str.islower()# Vérifie si str est en minuscules (booléen)
+str.upper()# Renvoie une copie de str en majuscule.
+str.lower()# Renvoie une copie de str en minuscule.
+\end{python}
+
+\subsection{Manipulation}
+
+\exer
+
+Créez un nouveau script ou vous initialiserez \texttt{liste1} avec la valeur suivante :
+\begin{python}
+[1, 2, 3, 4, 5, 65, 34, 6, 'B', 43, 'A', 'Y', 54, 'P']
+\end{python}
+
+Ajoutez à \texttt{liste1} un nouvel élément, ayant pour valeur 128. Utilisez la méthode \texttt{append} qui permet d''ajouter un élément à une liste :
+
+\begin{python}
+liste1.append(128)
+\end{python}
+
+ "Ajoutez" \texttt{liste2} à \texttt{liste1} (opérateur +) :
+
+\begin{python}
+liste2 = ["mot", "autre"]
+\end{python}
+
+Afficher liste1 doit renvoyer :
+
+\begin{python}
+['A', 1, 2, 3, 4, 5, 6, 65, 43, 34, 'P', 'B',
+ 54, 'Y', 128, 'mot', 'autre']
+\end{python}
+
+ Retirez de liste1 l'élément ayant la valeur 34 avec la méthode \texttt{remove} qui prend en paramètre la valeur de l'élément à retirer (cf. documentation mentionnée plus haut).
+
+ "Multipliez" liste1 par 2 avec l'opérateur * afin d'obtenir une liste dupliquée :
+
+\begin{python}
+['A', 1, 2, 3, 4, 5, 6, 65, 43, 'P', 'B', 54, 'Y', 128,
+ 'mot', 'autre', 'A', 1, 2, 3, 4, 5, 6, 65, 43, 'P', 
+'B', 54, 'Y', 128, 'mot', 'autre'] <type 'list'>
+\end{python}
+
+Faites afficher l'indice du premier élément trouvé ayant la valeur "Y". Utilisez la méthode:
+
+\begin{python}
+ liste1.index(...)
+\end{python}
+
+ où \dots est la valeur de l'élément à chercher. L'indice retourné par \texttt{index} devrait être 10.
+
+\begin{itemize}
+\item Combien de fois l'élément "autre" est-il présent dans la liste ?
+\item Vérifiez avec la méthode \texttt{count()}
+\end{itemize}
+
+ Inversez l'ordre d'apparition des éléments dans la liste en utilisant la méthode \texttt{reverse()}. Vous devriez obtenir :
+
+\begin{python}
+['autre', 'mot', 128, 'Y', 54, 'B', 'P', 43, 65, 6,
+ 5, 4, 3, 2, 1, 'A', 'autre', 'mot', 128, 'Y', 54,
+ 'B', 'P', 43, 65, 6, 5, 4, 3, 2, 1, 'A']
+\end{python}
+
+Supprimez les doublons (utilisation de \texttt{set()} ci-dessus), et triez la liste à l'aide la méthode \texttt{sort()}. Vous devez obtenir :
+
+\begin{python}
+[1, 2, 3, 4, 5, 6, 43, 54, 65, 128, 'A',
+ 'B', 'P', 'Y', 'autre', 'mot']
+\end{python}
+
+\section{Analogie de traitement entre listes et chaînes de caractères (String)}
+
+\textbf{\textcolor{blue}{Cet exercice est à déposer sur Moodle sous le nom NUMETU.py, où NUMETU est votre numéro d'étudiant}}
+
+\exer
+ Recopiez et testez les lignes de code suivantes :
+
+\begin{python}
+s = "Analogie de traitement entre listes..."
+print(s[0]) #extrait le caractère à l'indice 0
+print(s[2:6])#extrait des sous-parties de la chaîne s
+print(s[:4])
+print(s[6:])
+\end{python}
+
+Nous avons beaucoup travaillé jusqu'ici avec la boucle \texttt{while}, nous allons maintenant approfondir sur la boucle \texttt{for}. Testez par exemple :
+\begin{python}
+for index in range(len(s)) :
+  print(s[index])
+for index in range(10,20) :
+  print(s[index])
+\end{python}
+
+ Utilisez ces exemples pour extraire de la chaîne s :
+\begin{itemize}
+  \item le caractère à l'indice 3 ;
+  \item le troisième caractère ;
+  \item les caractères aux indices de 1 à 5 ;
+  \item tous les caractères à partir de l'indice 10 inclus ;
+  \item les trois derniers caractères ;
+  \item tous les caractères à l'exception des 6 derniers.
+\end{itemize}
+
+%Inspirez vous de l'exemple suivant 
+
+\begin{itemize}
+  \item Combien de fois apparaît la lettre "e" ? (Utilisez la méthode count)
+  \item Supprimez le point en fin de ligne à l'aide de la méthode replace().
+  \item Vérifiez la présence du mot "entre" dans la chaîne. Utilisez la méthode find().
+  \item Que signifie le résultat que vous obtenez ?
+  \item Cherchez la présence de "analogie" dans la chaîne. Que signifie le résultat obtenu ?
+  \item Utilisez la méthode split() pour obtenir tous les mots de cette chaîne.
+\end{itemize}
+
+\section{Tableaux (listes de listes)}
+Un tableau (ou liste de listes) permet de stocker des données en conservant la notion d'ordre propre aux listes.
+De telle sorte que l'on peut travailler sur des lignes et des colonnes : aller chercher l'information qui est stockée à la ligne X, colonne Y. Par convention, on nomme $i$ le numéro de ligne et $j$ le numéro de colonne.
+
+\subsection{Parcours de tableaux avec While}
+
+\exer
+Voici un exemple de tableau :
+
+\begin{python}
+t = [[1,0,1],[0,0,1],[1,1,0]]
+\end{python}
+
+\begin{itemize}
+  \item Recopiez ce tableau dans un nouveau script (ou une nouvelle celulle sur Notebook)
+  \item Affichez les trois éléments le composant
+  \item Affichez égalemnt le type de chaque élément
+\end{itemize}
+
+
+\begin{itemize}
+\item Étudiez le script ci-dessous, ne le codez pas.
+\end{itemize}
+\begin{python}
+t = [[1,7,5],[6,14,2]]
+i = 0
+while i<len(t):
+  j = 0
+  while j <len(t[i]):
+    print(t[i][j],
+    j = j + 1)
+  print("")
+  i = i + 1
+\end{python}
+Répondez aux questions suivantes :
+\begin{itemize}
+ \item Que va-t-il afficher ?
+ \item Quelle est la valeur de t[1][2] ? de t[0][0] ?
+\end{itemize}
+
+
+\subsection{Parcours de tableaux avec For}
+
+\begin{itemize}
+\item Voici une autre façon, plus concise, de parcourir un tableau. Recopiez ce script.
+\begin{python}
+tab = [[1,7,5],[6,14,2]]
+  for ligne in tab:
+    for case in ligne:
+      print(case)
+\end{python}
+
+\item Éditez ce code afin qu'il affiche :
+
+\begin{python}
+tableau: [1, 7, 5]
+1
+7
+5
+---
+tableau: [6, 14, 2]
+6
+14
+2
+\end{python}
+\end{itemize}
+
+\section{Dictionnaires}
+
+ Cette structure de données est appelée aussi tableau associatif, c'est une structure qui \textbf{associe des clés et des valeurs}.
+ Dans un dictionnaire \textsc{Python}, ce n'est plus la notion d'ordre qui permet de ranger les données. La donnée est associée à une clé qui permet d'y accéder directement.
+ Dans la liste, pour accéder à un élément on utilise sa position, ici c'est la clé qui remplit cette office. L'avantage est que la clé peut être (et est souvent) une chaîne de caractères, elle peut donc avoir une sémantique plus étendue qu'un simple indice.
+
+Voici un exemple :
+\begin{python}
+nc1 = { "lemme" : "nourriture",
+	"genre" : "fem",
+	"ENG"   : "food"
+      }
+\end{python}
+
+Notez bien que le dictionnaire peut tout aussi bien être déclaré en une seule ligne (c'est d'ailleurs comme cela que \textsc{Python} le représentera si l'on fait un \texttt{print}). Cette mise en forme pour rendre plus lisible par l'humain s'appelle l'impression élégante (\textit{pretty printing}), on utilise aussi le verbe \textit{prettify}.
+
+\exer
+
+\begin{itemize}
+ \item Copiez-collez le contenu du script dictionnaire.py de votre dossier Methodo\_TD2. Ce script déclare une série de dictionnaires regroupés dans une liste appelée NC.
+ \item Faites afficher NC avec un \texttt{print} classique puis en impression élégante comme dans l'exemple suivant :
+\begin{python}
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(NC)
+\end{python}
+\item Affichez maintenant les clés et les valeurs de nc1. Utilisez les
+méthodes keys() et values().
+\item Affichez pour nc1 la valeur de la clé "lemme", pour ce faire utilisez les crochets.
+ \item Parcourez la liste NC avec for \dots in. Pour chaque dictionnaire, extrayez le lemme. Si le lemme rencontré est "eau", alors affichez la traduction anglaise.
+ \item La liste de dictionnaires n'est pas une structure idéale, testez le code suivant qui crée et utilise un dictionnaire de dictionnaires:
+\begin{python}
+dico_complet = {}#initialisation du dictionnaire
+for dic in NC:#ajout des informations dans le dictionnaire
+  lemme = dic["lemme"]
+  dico_complet[lemme] = dic
+
+import pprint #Pour affichage
+pp = pprint.PrettyPrinter(indent =4)
+pp.pprint(dico_complet)#observez la différence
+
+for lemme, infos in dico_complet.items():#parcours
+  if lemme=="eau":
+    print(infos["ENG"])
+\end{python}
+ \item Ouvrez en lecture seule le fichier Liste\_mots.txt. Parcourez le et affichez chaque ligne.
+\item Utilisez maintenant la méthode strip() pour afficher la ligne en supprimant les caractères de début et fin de ligne ($\backslash n$ par exemple). Remarquez que nous n'avons désormais que la suite de caractères correspondant au mot lui même. Stockez ces mots dans une liste "liste\_mots"
+ \item Pour chaque ligne, vérifiez si le mot rencontré est présent dans la liste des lemmes de NC (). Si le mot est présent, affichez ses caractéristiques sous la forme : lemme (genre) -- ENG
+\item Maintenant, plutôt que d'afficher ce résultat, stockez le dans un nouveau fichier texte que vous appellerez Dictionnaire\_fr\_eng.txt.
+\end{itemize}
+
+Au final, Dictionnaire\_fr\_eng.txt contiendra ces informations, sous cette forme :
+\begin{python}
+pain (masc) - bread
+eau (fem) - water
+boisson (masc) - drink
+nourriture (fem) - food
+\end{python}
+
+\exer
+
+\begin{itemize}
+ \item Copiez-collez la \textbf{base de connaissances} de dictionnaire.py dans un nouveau script.
+\end{itemize}
+
+Nous souhaitons étiqueter le fichier Dure\_vie.txt. Si nous rencontrons un des mots
+contenus dans la base de connaissances, nous ajoutons alors le genre du mot à la
+suite de ce mot dans le texte. Nous enregistrons le texte étiqueté (taggé) dans
+Dure\_vie\_tag.txt. Voici ce qui doit apparaître dans ce nouveau fichier texte :
+
+\begin{python}
+"Tous les jours, nous ne mangions que du pain<masc>.
+On ne nous donnait également que de l' eau<fem> croupie.
+Quelle dure vie !
+Je ne rêvais alors que d'une bonne nourriture<fem> 
+riche et savoureuse,et d'une bonne rasade d'alcool<masc> !"
+\end{python}
+
+Voici quelques indications pour obtenir ce résultat :
+\begin{itemize}
+ \item Ouvrez le fichier Dure\_vie.txt en lecture seule puis parcourez le ligne par ligne.
+ \item Décollez les caractères de ponctuation des autres mots : la ",", le ".", etc\dots (NB: ceci revient à effectuer un remplacement avec la méthode \texttt{replace})
+ \item Séparez les apostrophes : "d'une" doit devenir "d' une".
+ \item Pour chaque ligne, découpez en mots (méthode \texttt{split})%Faites en sorte que chaque mot de la phrase soit représenté en une liste.
+ \item Parcourez la liste de mots :
+\begin{itemize}
+  \item S'il ne fait pas partie des lemmes du dictionnaire, écrivez le tel quel.
+ \item Si le mot rencontré fait partie des lemmes du dictionnaire :
+ \begin{itemize}
+   \item ajoutez-lui une balise de genre.
+   \item Écrivez le mot dans le fichier Dure\_vie\_tag.
+ \end{itemize}
+ \end{itemize}
+\end{itemize}

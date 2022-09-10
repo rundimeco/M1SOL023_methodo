@@ -1,0 +1,213 @@
+
+\newcommand{\numTD}{TD3}
+\newcommand{\themeTD}{Lire des textes avec la machine}
+
+\input{../entete_TD_methodoM1}
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+
+\section*{Installation et rappels}
+
+ Pour les consignes d'installation, référez vous au module de Remise à Niveau \url{https://moodle.paris-sorbonne.fr/course/index.php?categoryid=411}
+%\begin{itemize}
+%\item \url{https://moodle.paris-sorbonne.fr/} "Sciences Humaines/Informatique Appliquée"
+%\item ou directement : \url{https://moodle.paris-sorbonne.fr/course/index.php?categoryid=411}
+%\end{itemize}
+
+\section*{Introduction}
+
+ Ce cours de Méthodologie vise à vous enseigner des méthodes de classification automatique de textes. Pour ce faire, nous devrons constituer un jeu données dans le TD4 :
+
+\begin{enumerate}
+  \item  Construire un sous-ensemble de données nommé "jeu d'apprentissage" (training set). Ces données contiendront deux types d'informations : pour chaque texte, nous indiquons la classe (dans notre cas, il s'agit du genre littéraire du texte : journalistique, littérature, etc.), et un ensemble d'indices (ou \textit{features}) permettant – selon vous – de différencier les genres les uns des autres.
+  \item  Construire un ensemble de données dont on cherche à deviner l'étiquette ou "jeu de test" (test set), c'est-à-dire des textes pour lesquels nous n'indiquons à la machine que les indices, mais pas la classe (ou valeur cible). Ce jeu de données sert à vérifier (tester) que le modèle appris est fiable.
+  \item  Utiliser des algorithmes de classification : avec la plateforme \textsc{Weka} ou avec l'outil \texttt{sklearn} (présentés dans le prochain TD), nous exploiterons notre corpus d'apprentissage, et nous tenterons de trouver quel est le meilleur modèle qui nous permettrait de réaliser la classification du corpus de test
+\end{enumerate}
+
+ Pour faire fonctionner ces algorithmes, il faudra extraire des \textbf{indices} (features) qui vont permettre de représenter, le plus souvent, les textes sous forme de vecteurs et les corpus sous forme de matrices de vecteurs. Ceci afin de représenter les données sous des formes adaptées au calcul.
+
+ Les indices utilisables sont très nombreux, ils peuvent faire appel à différents niveaux de représentation linguistique : morphologie, syntaxe, lexique, style\dots 
+ On sait par exemple que l'utilisation des pronoms personnels est un indice du genre de texte : un texte issu d'un journal contiendra rarement le pronom "tu", tandis qu'on pourra le trouver plus facilement dans un texte littéraire.
+Pour ce TD, nous travaillons sur les deux textes contenus dans le dossier TD3\_textes (LExpress.txt et Hugo.txt) disponible sur Moodle.
+
+ L'objectif aujourd'hui est de déterminer quelques critères qui nous permettent de différencier les deux genres littéraires (i.e. journalistique et littéraire).
+Conservez chacun des scripts réalisés lors de ce TD : ils seront utiles pour votre projet final. 
+%Réalisez les manipulations 2, 3 et 4 ci-dessous pour chacun des textes.
+
+
+%\section{Statistiques sur le texte}
+\section{Statistiques sur les caractères}
+
+Il a été démontré dans de nombreux domaines (par exemple l'attribution d'auteur) que les statistiques sur l'utilisation des caractères dans les textes étaient très efficaces pour la classification.
+ Nous traiterons donc tout d'abord nos textes au grain caractère avant d'aller découper en mots.
+
+\exer
+\begin{itemize}
+  \item  Créez un dictionnaire \textsc{Python} répertoriant chaque caractère, et son nombre d'apparitions. Inspirez vous du code suivant :
+  \begin{python}
+def lire_fichier(chemin_fichier):
+  f = open(chemin_fichier, "r")
+  texteComplet = f.read()     
+  f.close()    
+  return texteComplet 
+chemin_fichier = ... #chemin vers Hugo.txt
+texte = lire_fichier(chemin_fichier)
+dico_caracteres = {} 
+for caractere in texte:
+  if caractere not in dico_caracteres:#on crée une entrée
+    dico_caracteres[caractere]=1
+  else: #On l'a vu une fois de plus :
+    dico_caracteres[caractere]+=1
+\end{python}
+\item On obtiendra quelque chose du genre :
+\begin{python}
+  dico_caracteres = {"b":58, "c":19, "a":75,
+ " ":300, "d":39, "e":149....}
+#Tous les caractères comptent !
+\end{python}
+\item Pour plus de lisibilité on voudra peut être trier le dictionnaire par effectif décroissant. Pour ce faire, vous pouvez utiliser de ce code :
+\begin{python}
+def trier_dic(dic):
+  L = []
+  for car, effectif in dic.items():
+    #On prépare le tri sur l'effectif:
+    L.append([effectif, car])
+  L_sorted = sorted(L, reverse=True)
+  L_reorganisee = []
+  for effectif, car in L_sorted:
+    #On remet la paire caractère, effectif :
+    L_reorganisee.append([car, effectif])
+  return L_reorganisee
+\end{python}
+\item Ou en plus condensé :
+\begin{python}
+def trier_dic(dic):
+  L = [[effectif,car] for car,effectif in dic.items()]
+  L_sorted = sorted(L, reverse=True)
+  return [[car,effectif] for effectif,car in L_sorted]
+\end{python}
+\item Testez le code suivant :
+\begin{python}
+dico_caracteres = {"b":58, "c":19, "a":75,
+ " ":300, "d":39, "e":149....}
+c_trie=trier_dic(dico_caracteres)
+print(c_triee)
+\end{python}
+\item A vous : faites afficher les 5 caractères les plus fréquents du texte
+\end{itemize}
+%  \item  Consultez les principes d'organisation du code donnés dans la section 5 (dernière page), modifiez votre code en conséquence et gardez ces principes en tête pour la suite.
+
+\section{Statistiques sur les mots}
+
+\subsection{Pré-traitement}
+ Découper en mots passe par la reconnaissance des séparateurs entre mots.
+Une des méthodes consiste à effectuer des pré-traitements pour unifier les séparateurs. %impose un certain nombre de pré-traitements
+
+\exer
+\begin{enumerate}
+  \item  Ouvrez le fichier texte en mode lecture. Lisez l'intégralité du texte et stockez-le dans une variable. Ne faites pas de modifications directement dans cette variable, vous l'exploiterez à nouveau dans la suite de ce TD.
+  \item  Remplacez les ponctuations du texte par des espaces (utilisez la fonction "sub" de la bibliothèque "re"):
+\begin{python}
+import re# bibliothèque expression régulière
+texte = "En effet, il faudrait pré-traiter cette phrase;
+ ce serait pratique."
+#On substitue "," par " " dans la variable texte :
+texte_sans_ponct = re.sub(",", " ", texte)
+print(texte)
+print(texte_sans_ponct)
+#on peut enchaîner les "sub" ...
+# ou utiliser le "|" qui signifie "ou" :
+texte_sans_ponct = re.sub(",|;|\.", " ", texte)
+# Si on a ",", ";" ou "." in remplace par " " dans texte
+#NB: Il faut despécialiser le point qui
+# a une signification particulière dans la bibliothèque re
+\end{python}
+
+  \item  Remplacez les majuscules par des minuscules. NB : il existe une fonction python qui effectue cette opération
+\end{enumerate}
+
+\subsection{Travail sur les mots}
+\begin{enumerate}
+  \item  Transformez le texte "Hugo.txt" en une liste, où chaque mot sera un élément de la liste. (méthode \textsc{split})
+  \item  A partir de cette liste, créez un dictionnaire répertoriant chaque mot, et son nombre d'apparitions.
+  \item  Pour repérer les mots les plus fréquents, triez le dictionnaire par nombre d'occurrences (les mots les plus fréquents apparaîtront en premier).
+  \item  Dans le dictionnaire, supprimez les entrées correspondant à des mots vides (définissez ce qu'est un mot vide pour ce type de textes).
+  \item  Faites afficher les 10 mots les plus fréquents.
+  \item  Calculez la longueur moyenne, minimale et maximale des mots du texte
+\end{enumerate}
+
+\section{Statistiques sur les phrases}
+\begin{enumerate}
+  \item  Reprenez le texte initial (avec ponctuations), découpez le en phrases
+  \item  Comptez le nombre total de phrases.
+  \item  Comptez le nombre d'affirmatives, d'interrogatives, d'exclamatives.
+  \item  Quelle est la longueur moyenne, minimale et maximale des phrases ?
+\end{enumerate}
+
+\section{Valeur absolue, valeur relative}
+
+ Lorsque l'on compare des valeurs absolues (des effectifs), il peut y avoir des biais liées à des différences de taille entre les textes comparés.
+ Un des moyens de limiter ce biais est de travailler en valeur relative (fréquence), par exemple plutôt que de compter le nombre de "a", compter la fréquence des "a" dans le texte.
+Cela consiste à diviser l'effectif de "a" par la taille du texte.
+
+\exer
+ Reprenez les différentes statistiques vues depuis le début, déterminez pour lesquelles il serait utile de tenir compte de la valeur relative.
+ Copiez-collez les bouts de code concernés dans un nouveau script et modifiez les en conséquence.
+ 
+\section{Comparaison des textes}
+Vous avez affiché différentes statistiques pour chacun des textes : les 5 caractères les plus fréquents, les 10 mots les plus fréquents, etc.
+
+\exer
+\begin{enumerate}
+  \item  Etudiez les statistiques pour les deux textes : quelles caractéristiques sont pertinentes pour différencier les deux textes ?
+  \item  Exploitez les fonctions que vous avez créées de manière à permettre la comparaison de deux textes en une seule opération (combiner boucle for + fonctions)
+\end{enumerate}
+
+\section{Amélioration du script ("Make it clean")}
+
+Si vous ne l'avez pas déjà fait, il est temps d'organiser votre code. Regroupez les différentes parties de votre script en sections : 
+\begin{enumerate}
+  \item  Les fonctions (les différents modules de votre chaîne de traitement);
+  \item  Les constantes (i.e. des variables qui peuvent être utilisées partout dans le code, et qui ne seront jamais modifiées par le script) ;
+  \item  Le Main (le cœur du script, c'est-à-dire ce qui sera exécuté en tout premier, et qui viendra appeler la première fonction utilisée). 
+\end{enumerate}
+
+ Ceci permet de repérer les différentes étapes de votre chaîne de traitement.
+Vérifiez que vos variables et fonctions importantes portent un nom clair et lisible. Par exemple, la variable qui contient l'intégralité du texte s'appellera "texteComplet" plutôt que "t" ou "texte" (etc\dots).
+
+Le code de votre projet sera relu par d'autres gens que vous. Veillez donc à le rendre clair et facilement déchiffrable en suivant ces trois consignes !
+
+\begin{python}
+################################
+## Fonctions
+#Fonction pour ouvrir un fichier sous forme de chaîne de caractères
+def lire_fichier(chemin_fichier):
+  f = open(chemin_fichier, "r")
+  texteComplet = f.read() #Lecture du fichier, stockage 
+  f.close()    #On ferme le flux car on en a plus besoin
+  return texteComplet #on renvoie la chaîne de caractères
+#Fonction pour supprimer la ponctuation
+def SupprimerPonctuation(chaine):
+  ...
+  return chaine_nettoyee
+#Fonction pour compter les caractères d'une chaine
+def CompterCaracteres(texte):
+  ...
+  return dico_caracteres
+###############################
+##CONSTANTES
+liste_fichiers = ["TD3_textes/LExpress.txt", "TD3_textes/Hugo.txt"]
+###############################
+## MAIN
+##BOUCLE CHAINE DE TRAITEMENT
+for chemin_fichier in liste_fichiers:
+  print("Traitement en cours : ", chemin_fichier)
+  texteComplet = lire_fichier(....
+  texte = SupprimerPonctuation(texteComplet)...
+  ...
+\end{python}
+%  listePonct = [",",".","(",")","\"","'","!","?","\n","-",";",":"]

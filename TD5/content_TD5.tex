@@ -1,0 +1,46 @@
+
+\newcommand{\numTD}{TD5}
+\newcommand{\themeTD}{Classifier des chansons}
+
+\input{../entete_TD_methodoM1}
+
+\hrule
+%%%%%%%%%%%%%%%%%%%%%%%%%EN-TETE%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\renewcommand{\contentsname}{Sommaire du TD}
+%\tableofcontents
+%\newpage
+
+\noindent\fcolorbox{red}{lightgray}{
+\begin{minipage}{12cm}
+\section*{Objectifs}
+
+\begin{itemize}
+  \item Parser un corpus de chansons en XML
+  \item Représenter informatiquement les textes des chansons
+  \item Apprendre à découvrir les auteurs
+  \item Varier les représentations informatiques des textes
+%  \item Maîtriser la terminologie : classes, instances, attributs \dots
+\end{itemize}
+\end{minipage}
+}
+
+\vspace{3cm}
+Le code en ligne sur Moodle vous permet de manipuler le corpus et de faire un premier essai de classification.
+
+Travail à commencer en TD et à finir pour la prochaine fois :
+
+\begin{itemize}
+  \item Modifier la manière de représenter les textes en epxloitant le sparamètres du CountVectorizer\footnote{\url{https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html}} :
+  \begin{itemize}
+    \item enlever les mots outils (\texttt{stopwords})
+    \item prendre seulement les 1000 mots les plus fréquents du corpus (\texttt{max\_features})
+    \item travailler sur des n-grammes de mots (\texttt{ngram\_range})
+    \item travailler sur des n-grammes de caractères (\texttt{analyzer})
+  \end{itemize}
+  \item Noter quand les résultats évoluent positivement ou pas
+  \item Combiner ces pré-traitements
+  \item Tester 2 autres classifieurs, comparer leurs résultats
+  \item Réfléchissez à des améliorations possibles sur la vectorisation des textes (types d'observables, de pré-taritements, de filtres \dots)
+\end{itemize}
+
+Déposez sur Moodle pour le 24/10 votre code + 1 page de commentaire des résultats et possibilités d'améliorations (en PDF)
